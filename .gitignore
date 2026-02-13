@@ -35,4 +35,4 @@ build/
 /target
 /.idea
 *.log
-application.yml
+application.yaml
