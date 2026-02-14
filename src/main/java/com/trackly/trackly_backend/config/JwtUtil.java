@@ -19,7 +19,7 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private long expirationTime;
-
+    private long exp =30000;
     private Key getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
@@ -30,7 +30,7 @@ public class JwtUtil {
                 .setSubject(String.valueOf(userId))
                 .claim("role",role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis()+expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis()+exp))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -53,7 +53,7 @@ public class JwtUtil {
         }
     }
 
-    private Claims extractAllClaims(String token){
+    public Claims extractAllClaims(String token){
         return  Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()

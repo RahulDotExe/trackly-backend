@@ -2,11 +2,15 @@ package com.trackly.trackly_backend.config;
 
 import com.trackly.trackly_backend.user.User;
 import com.trackly.trackly_backend.user.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,31 +32,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request,response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
-        if(!jwtUtil.isTokenValid(token)){
-            filterChain.doFilter(request,response);
-            return;
+
+        try {
+            Claims claims = jwtUtil.extractAllClaims(token);
+
+            String userId = claims.getSubject();
+
+            User user = userRepository.findById(Long.parseLong(userId))
+                    .orElse(null);
+
+            if (user != null) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            filterChain.doFilter(request, response);
+
+        } catch (ExpiredJwtException e) {
+            throw new BadCredentialsException("Token Expired");
+        } catch (JwtException e) {
+            throw new BadCredentialsException("Invalid Token");
         }
 
-        String userId = jwtUtil.extractUSerId(token);
-
-        User user = userRepository.findById(Long.parseLong(userId))
-                .orElse(null);
-
-        if( user != null){
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_"+user.getRole().name()))
-            );
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        }
-        filterChain.doFilter(request,response);
-
-        }
+    }
 }
