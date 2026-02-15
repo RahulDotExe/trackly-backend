@@ -1,12 +1,12 @@
-package com.trackly.trackly_backend.user;
+package com.trackly.trackly_backend.user.controller;
 
+import com.trackly.trackly_backend.user.service.UserService;
 import com.trackly.trackly_backend.user.dto.LoginRequest;
 import com.trackly.trackly_backend.user.dto.LoginResponse;
 import com.trackly.trackly_backend.user.dto.RegisterRequest;
 import com.trackly.trackly_backend.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.TargetEmbeddable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

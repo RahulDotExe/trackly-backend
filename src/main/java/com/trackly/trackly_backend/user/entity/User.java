@@ -1,6 +1,7 @@
-package com.trackly.trackly_backend.user;
+package com.trackly.trackly_backend.user.entity;
 
 
+import com.trackly.trackly_backend.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
 

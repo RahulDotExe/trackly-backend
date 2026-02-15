@@ -1,5 +1,6 @@
-package com.trackly.trackly_backend.user;
+package com.trackly.trackly_backend.user.repository;
 
+import com.trackly.trackly_backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

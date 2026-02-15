@@ -1,10 +1,15 @@
-package com.trackly.trackly_backend.user;
+package com.trackly.trackly_backend.user.service;
 
 import com.trackly.trackly_backend.config.JwtUtil;
+import com.trackly.trackly_backend.user.EmailAlreadyExistsException;
+import com.trackly.trackly_backend.user.InvalidCredentialsException;
+import com.trackly.trackly_backend.user.Role;
+import com.trackly.trackly_backend.user.repository.UserRepository;
 import com.trackly.trackly_backend.user.dto.LoginRequest;
 import com.trackly.trackly_backend.user.dto.LoginResponse;
 import com.trackly.trackly_backend.user.dto.RegisterRequest;
 import com.trackly.trackly_backend.user.dto.UserResponse;
+import com.trackly.trackly_backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;

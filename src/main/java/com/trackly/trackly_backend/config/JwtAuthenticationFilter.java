@@ -1,7 +1,7 @@
 package com.trackly.trackly_backend.config;
 
-import com.trackly.trackly_backend.user.User;
-import com.trackly.trackly_backend.user.UserRepository;
+import com.trackly.trackly_backend.user.entity.User;
+import com.trackly.trackly_backend.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
