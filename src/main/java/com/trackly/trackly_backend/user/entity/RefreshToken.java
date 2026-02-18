@@ -22,7 +22,7 @@ import java.util.UUID;
 
         },
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_token_hash",columnNames = "tokenHash")
+                @UniqueConstraint(name = "uk_token_hash",columnNames = "token_hash")
         }
 )
 public class RefreshToken {

@@ -24,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private  final RefreshTokenService refreshTokenService;
 
 
     public UserResponse register(RegisterRequest request){
@@ -65,7 +66,8 @@ public class UserService {
         }
 
         String token = jwtUtil.generateToken(user.getId(),user.getRole().name());
-        return new LoginResponse(token);
+        String refreshToken = refreshTokenService.createRefreshToken(user);
+        return new LoginResponse(token, refreshToken);
     }
 
 
