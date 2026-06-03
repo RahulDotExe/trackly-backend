@@ -1,4 +1,4 @@
-package com.trackly.trackly_backend.user;
+package com.trackly.trackly_backend.user.exceptions;
 
 public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException(String message) {

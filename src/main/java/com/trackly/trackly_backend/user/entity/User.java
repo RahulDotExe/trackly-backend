@@ -1,11 +1,12 @@
 package com.trackly.trackly_backend.user.entity;
 
 
-import com.trackly.trackly_backend.user.Role;
+import com.trackly.trackly_backend.common.entity.BaseEntity;
+import com.trackly.trackly_backend.user.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name="users")
@@ -14,10 +15,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+public class User extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -28,8 +29,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private Role role;

@@ -1,5 +1,7 @@
 package com.trackly.trackly_backend.user.service;
 
+import com.trackly.trackly_backend.config.JwtUtil;
+import com.trackly.trackly_backend.user.dto.LoginResponse;
 import com.trackly.trackly_backend.user.entity.RefreshToken;
 import com.trackly.trackly_backend.user.entity.User;
 import com.trackly.trackly_backend.user.repository.RefreshTokenRepository;
@@ -20,8 +22,8 @@ import java.util.Base64;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${refresh-token.expiration-days}")
+    private final JwtUtil jwtUtil;
+    @Value("${app.refresh-token.expiration-days}")
     private long refreshTokenExpirationDays;
 
     //Public  API
@@ -72,5 +74,35 @@ public class RefreshTokenService {
         } catch (NoSuchAlgorithmException e){
             throw new IllegalStateException("SHA-256 algorithm not found",e);
         }
+    }
+
+    public LoginResponse refresh(String rawRefreshToken){
+        String tokenHash= hashToken(rawRefreshToken);
+        RefreshToken storedToken = refreshTokenRepository.findByTokenHashAndRevokedFalse(tokenHash)
+                .orElseThrow(() -> new RuntimeException("Invalid Refresh Token"));
+
+        if (storedToken.getExpiresAt().isBefore(Instant.now())){
+            throw new RuntimeException("Invalid Refresh Token");
+        }
+        storedToken.setRevoked(true);
+        refreshTokenRepository.save(storedToken);
+
+        String newRawRefreshToken = generateSecureToken();
+        String newHash = hashToken(newRawRefreshToken);
+
+        RefreshToken newRefreshToken = new RefreshToken();
+        newRefreshToken.setUser(storedToken.getUser());
+        newRefreshToken.setTokenHash(newHash);
+        newRefreshToken.setExpiresAt(storedToken.getExpiresAt());
+        newRefreshToken.setRevoked(false);
+
+        refreshTokenRepository.save(newRefreshToken);
+
+        User user = storedToken.getUser();
+        String newAccessToken = jwtUtil.generateToken(user.getId(), user.getRole().name());
+
+        return new LoginResponse(newAccessToken,newRawRefreshToken);
+
+
     }
 }

@@ -1,9 +1,9 @@
 package com.trackly.trackly_backend.user.service;
 
 import com.trackly.trackly_backend.config.JwtUtil;
-import com.trackly.trackly_backend.user.EmailAlreadyExistsException;
-import com.trackly.trackly_backend.user.InvalidCredentialsException;
-import com.trackly.trackly_backend.user.Role;
+import com.trackly.trackly_backend.user.exceptions.EmailAlreadyExistsException;
+import com.trackly.trackly_backend.user.exceptions.InvalidCredentialsException;
+import com.trackly.trackly_backend.user.enums.Role;
 import com.trackly.trackly_backend.user.repository.UserRepository;
 import com.trackly.trackly_backend.user.dto.LoginRequest;
 import com.trackly.trackly_backend.user.dto.LoginResponse;
@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -37,7 +38,6 @@ public class UserService {
                 .email(normalizedEmail)
                 .password(hashedPassword)
                 .role(Role.USER)
-                .createdAt(LocalDateTime.now())
                 .build();
 
         try{
@@ -69,6 +69,11 @@ public class UserService {
         String refreshToken = refreshTokenService.createRefreshToken(user);
         return new LoginResponse(token, refreshToken);
     }
+
+    public LoginResponse refresh(String rawRefreshToken){
+        return refreshTokenService.refresh(rawRefreshToken);
+    }
+
 
 
 

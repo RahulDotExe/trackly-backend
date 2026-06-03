@@ -6,6 +6,7 @@ import com.trackly.trackly_backend.user.dto.LoginResponse;
 import com.trackly.trackly_backend.user.dto.RegisterRequest;
 import com.trackly.trackly_backend.user.dto.UserResponse;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,10 @@ public class UserController {
         cookie.setMaxAge(7*24*60*60); // 7 days
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(new LoginResponse(loginResponse.getToken(),null));
+        return ResponseEntity.ok(
+                new LoginResponse(loginResponse.getAccessToken(), null)
+        );
+
     }
 
     @GetMapping("/profile")
@@ -53,6 +57,41 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> adminOnly() {
         return ResponseEntity.ok("Welcome Admin");
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+
+        String refreshToken = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        LoginResponse loginResponse = userService.refresh(refreshToken);
+
+        Cookie newCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
+        newCookie.setHttpOnly(true);
+        newCookie.setSecure(false);
+        newCookie.setPath("/");
+        newCookie.setMaxAge(7 * 24 * 60 * 60);
+
+        response.addCookie(newCookie);
+
+        return ResponseEntity.ok(
+                new LoginResponse(loginResponse.getAccessToken(), null)
+        );
     }
 
 }

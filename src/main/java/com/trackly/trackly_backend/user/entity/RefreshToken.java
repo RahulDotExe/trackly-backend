@@ -1,5 +1,6 @@
 package com.trackly.trackly_backend.user.entity;
 
+import com.trackly.trackly_backend.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import java.util.UUID;
                 @UniqueConstraint(name = "uk_token_hash",columnNames = "token_hash")
         }
 )
-public class RefreshToken {
+public class RefreshToken extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -42,15 +43,6 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private boolean revoked = false;
-
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = Instant.now();
-    }
 
 
 

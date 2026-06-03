@@ -1,7 +1,7 @@
 package com.trackly.trackly_backend.common;
 
-import com.trackly.trackly_backend.user.EmailAlreadyExistsException;
-import com.trackly.trackly_backend.user.InvalidCredentialsException;
+import com.trackly.trackly_backend.user.exceptions.EmailAlreadyExistsException;
+import com.trackly.trackly_backend.user.exceptions.InvalidCredentialsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.CONFLICT);
     }
-
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
