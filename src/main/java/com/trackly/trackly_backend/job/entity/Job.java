@@ -28,7 +28,7 @@ public class Job extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
-    private String role;
+    private String jobTitle;
 
     @Column(nullable = false)
     private String companyName;
